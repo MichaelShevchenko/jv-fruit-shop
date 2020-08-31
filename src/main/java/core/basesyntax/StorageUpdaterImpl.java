@@ -33,7 +33,8 @@ public class StorageUpdaterImpl implements StorageUpdater {
         Map<LocalDate, Integer> fruitReminders = new TreeMap<>(storageService.getFruit(fruitType));
         int neededToSell = fruitAmount;
         for (LocalDate toCompare : fruitReminders.keySet()) {
-            int expirationDateReminder = storageService.getExpirationDateReminder(fruitType, toCompare);
+            int expirationDateReminder = storageService
+                    .getExpirationDateReminder(fruitType, toCompare);
             if (date.isAfter(toCompare)) {
                 continue;
             }
