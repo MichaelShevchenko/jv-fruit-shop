@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class WriteToFileTest {
     private static StorageUpdater newUpdate;
+    private Storage storageService;
     private static final String FILLED_FILE_NAME = "src/test/resources/test11.csv";
     private static final String SECOND_FILLED_FILE_NAME = "src/test/resources/test6.csv";
     private static final String OUTPUT_FILE_PATH = "src/test/resources/current_reminder.csv";
@@ -24,7 +25,8 @@ public class WriteToFileTest {
     @Before
     public void setUpStorage() {
         newUpdate = new StorageUpdaterImpl();
-        Storage.clearStorage();
+        storageService = new Storage();
+        storageService.clearStorage();
     }
 
     @Test

@@ -9,11 +9,11 @@ import java.util.TreeMap;
 public class Storage {
     private static Map<String, TreeMap<LocalDate, Integer>> fruitsInStore = new HashMap<>();
 
-    public static TreeMap<LocalDate, Integer> getFruit(String fruit) {
+    public TreeMap<LocalDate, Integer> getFruit(String fruit) {
         return new TreeMap<>(fruitsInStore.get(fruit));
     }
 
-    public static void setTransaction(Transaction newTransaction) {
+    public void setTransaction(Transaction newTransaction) {
         String fruitType = newTransaction.getName();
         int fruitAmount = newTransaction.getQuantity();
         String operationType = newTransaction.getOperationType();
@@ -25,23 +25,23 @@ public class Storage {
         Storage.fruitsInStore.get(fruitType).putIfAbsent(date, fruitAmount);
     }
 
-    public static int getExpirationDateReminder(String fruit, LocalDate date) {
+    public int getExpirationDateReminder(String fruit, LocalDate date) {
         return fruitsInStore.get(fruit).get(date);
     }
 
-    public static void removeExpirationDateFruitReminder(String fruitType, LocalDate date) {
+    public void removeExpirationDateFruitReminder(String fruitType, LocalDate date) {
         fruitsInStore.get(fruitType).remove(date);
     }
 
-    public static void clearStorage() {
+    public void clearStorage() {
         fruitsInStore.clear();
     }
 
-    public static Set<String> getAllFruits() {
+    public Set<String> getAllFruits() {
         return fruitsInStore.keySet();
     }
 
-    public static Map<String, TreeMap<LocalDate, Integer>> getAllData() {
+    public Map<String, TreeMap<LocalDate, Integer>> getAllData() {
         Map<String, TreeMap<LocalDate, Integer>> storageCopy = new HashMap<>();
         for (String fruit : fruitsInStore.keySet()) {
             storageCopy.put(fruit, new TreeMap<>());
@@ -50,7 +50,7 @@ public class Storage {
         return storageCopy;
     }
 
-    public static boolean isFruitAbsent(String fruitType) {
+    public boolean isFruitAbsent(String fruitType) {
         return !fruitsInStore.containsKey(fruitType);
     }
 }

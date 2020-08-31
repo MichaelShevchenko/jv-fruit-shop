@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class StorageUpdaterImpl implements StorageUpdater {
+    private Storage storageService = new Storage();
 
     public void parseDataToStorage(List<Transaction> newData) {
         for (Transaction newTransaction : newData) {
@@ -18,7 +19,7 @@ public class StorageUpdaterImpl implements StorageUpdater {
             updateStorageAfterPurchase(newTransaction);
             return;
         }
-        Storage.setTransaction(newTransaction);
+        storageService.setTransaction(newTransaction);
     }
 
     private void updateStorageAfterPurchase(Transaction newTransaction) {
@@ -26,24 +27,24 @@ public class StorageUpdaterImpl implements StorageUpdater {
         int fruitAmount = newTransaction.getQuantity();
         LocalDate date = newTransaction.getDate();
 
-        if (Storage.isFruitAbsent(fruitType)) {
+        if (storageService.isFruitAbsent(fruitType)) {
             return;
         }
-        Map<LocalDate, Integer> fruitReminders = new TreeMap<>(Storage.getFruit(fruitType));
+        Map<LocalDate, Integer> fruitReminders = new TreeMap<>(storageService.getFruit(fruitType));
         int neededToSell = fruitAmount;
         for (LocalDate toCompare : fruitReminders.keySet()) {
-            int expirationDateReminder = Storage.getExpirationDateReminder(fruitType, toCompare);
+            int expirationDateReminder = storageService.getExpirationDateReminder(fruitType, toCompare);
             if (date.isAfter(toCompare)) {
                 continue;
             }
             if (expirationDateReminder > neededToSell) {
                 newTransaction.setQuantity(neededToSell);
                 newTransaction.setDate(toCompare);
-                Storage.setTransaction(newTransaction);
+                storageService.setTransaction(newTransaction);
                 return;
             } else {
                 neededToSell = neededToSell - expirationDateReminder;
-                Storage.removeExpirationDateFruitReminder(fruitType, toCompare);
+                storageService.removeExpirationDateFruitReminder(fruitType, toCompare);
             }
         }
     }

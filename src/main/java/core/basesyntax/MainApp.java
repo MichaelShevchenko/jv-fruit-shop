@@ -3,6 +3,7 @@ package core.basesyntax;
 import java.io.File;
 import java.io.IOException;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -31,7 +32,8 @@ public class MainApp {
 
         try {
             LocalFileReader reader = new LocalFileReader(filePath);
-            newUpdate.parseDataToStorage(reader.readTransactionsFile());
+            List<Transaction> listOfTransactions = reader.readTransactionsFile();
+            newUpdate.parseDataToStorage(listOfTransactions);
             CsvFileWriter writer = new CsvFileWriter(outPutFilePath);
             writer.writeToFile();
             System.out.println("All data has been successfully processed. File was written");

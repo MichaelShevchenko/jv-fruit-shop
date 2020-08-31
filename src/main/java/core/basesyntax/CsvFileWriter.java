@@ -8,6 +8,7 @@ import java.time.LocalDate;
 public class CsvFileWriter {
     private static final String OUTPUT_FILE_HEADER = "fruit,quantity\n";
     private final String outputFilePath;
+    private Storage storageService = new Storage();
 
     public CsvFileWriter(String outputFilePath) {
         this.outputFilePath = outputFilePath;
@@ -16,10 +17,10 @@ public class CsvFileWriter {
     public void writeToFile() throws IOException {
         PrintWriter writer = new PrintWriter(new File(outputFilePath));
         StringBuilder formattedData = new StringBuilder(OUTPUT_FILE_HEADER);
-        for (String fruit : Storage.getAllFruits()) {
+        for (String fruit : storageService.getAllFruits()) {
             int fruitInstanceSum = 0;
-            for (LocalDate expirationDate : Storage.getFruit(fruit).keySet()) {
-                fruitInstanceSum += Storage.getFruit(fruit).get(expirationDate);
+            for (LocalDate expirationDate : storageService.getFruit(fruit).keySet()) {
+                fruitInstanceSum += storageService.getFruit(fruit).get(expirationDate);
             }
             formattedData.append(fruit).append(',').append(fruitInstanceSum).append('\n');
         }

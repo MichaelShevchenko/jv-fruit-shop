@@ -11,6 +11,7 @@ import java.util.TreeMap;
 
 public class StorageUpdaterTest {
     private static StorageUpdater newUpdate;
+    private Storage storageService;
     private static final String PROPERLY_FILLED_FILE = "src/test/resources/test11.csv";
     private static final String SECOND_PROPERLY_FILLED_FILE = "src/test/resources/test6.csv";
     private static final String INCOMPLETE_DATA_FILE = "src/test/resources/test10.csv";
@@ -43,14 +44,15 @@ public class StorageUpdaterTest {
     @Before
     public void setUp() {
         newUpdate = new StorageUpdaterImpl();
-        Storage.clearStorage();
+        storageService = new Storage();
+        storageService.clearStorage();
     }
 
     @Test
     public void updateStorageWhenFruitIsAbsent() throws IOException {
         LocalFileReader reader = new LocalFileReader(PURCHASE_FROM_EMPTY_STOCK_FILE);
         newUpdate.parseDataToStorage(reader.readTransactionsFile());
-        Map<String, TreeMap<LocalDate, Integer>> actualResult = Storage.getAllData();
+        Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Map<String, TreeMap<LocalDate, Integer>> expectedResult = new HashMap<>();
         Assert.assertEquals(expectedResult, actualResult);
     }
@@ -59,7 +61,7 @@ public class StorageUpdaterTest {
     public void updateEmptyStorageFromFile() throws IOException {
         LocalFileReader reader = new LocalFileReader(PROPERLY_FILLED_FILE);
         newUpdate.parseDataToStorage(reader.readTransactionsFile());
-        Assert.assertEquals(toCompareEmptyStore, Storage.getAllData());
+        Assert.assertEquals(toCompareEmptyStore, storageService.getAllData());
     }
 
     @Test
@@ -68,7 +70,7 @@ public class StorageUpdaterTest {
         newUpdate.parseDataToStorage(reader.readTransactionsFile());
         LocalFileReader secondFileReader = new LocalFileReader(SECOND_PROPERLY_FILLED_FILE);
         newUpdate.parseDataToStorage(secondFileReader.readTransactionsFile());
-        Assert.assertEquals(toCompareNotEmptyStore, Storage.getAllData());
+        Assert.assertEquals(toCompareNotEmptyStore, storageService.getAllData());
     }
 
     @Test
