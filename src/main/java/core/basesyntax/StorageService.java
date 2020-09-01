@@ -9,7 +9,7 @@ import java.util.TreeMap;
 public class StorageService {
     private static Map<String, TreeMap<LocalDate, Integer>> fruitsInStore = new HashMap<>();
 
-    public TreeMap<LocalDate, Integer> getFruit(String fruit) {
+    public TreeMap<LocalDate, Integer> getFruitReminders(String fruit) {
         return new TreeMap<>(fruitsInStore.get(fruit));
     }
 
@@ -39,8 +39,10 @@ public class StorageService {
         int fruitAmount = newTransaction.getQuantity();
         LocalDate expirationDate = newTransaction.getDate();
 
-        if (fruitsInStore.containsKey(fruitType) && getFruit(fruitType).containsKey(expirationDate)) {
-            fruitsInStore.get(fruitType).put(expirationDate, fruitAmount + getExpirationDateReminder(fruitType, expirationDate));
+        if (fruitsInStore.containsKey(fruitType)
+                && getFruitReminders(fruitType).containsKey(expirationDate)) {
+            fruitsInStore.get(fruitType).put(expirationDate, fruitAmount
+                    + getExpirationDateReminder(fruitType, expirationDate));
         } else {
             fruitsInStore.putIfAbsent(fruitType, new TreeMap<>());
             fruitsInStore.get(fruitType).put(expirationDate, fruitAmount);
@@ -55,7 +57,7 @@ public class StorageService {
         if (!fruitsInStore.containsKey(fruitType)) {
             return;
         }
-        Map<LocalDate, Integer> fruitReminders = new TreeMap<>(getFruit(fruitType));
+        Map<LocalDate, Integer> fruitReminders = new TreeMap<>(getFruitReminders(fruitType));
         int neededToSell = fruitAmount;
         for (LocalDate expirationDate : fruitReminders.keySet()) {
             int expirationDateReminder = getExpirationDateReminder(fruitType, expirationDate);
@@ -63,7 +65,8 @@ public class StorageService {
                 continue;
             }
             if (expirationDateReminder > neededToSell) {
-                fruitsInStore.get(fruitType).put(expirationDate, getExpirationDateReminder(fruitType, expirationDate) - neededToSell);
+                fruitsInStore.get(fruitType).put(expirationDate,
+                        getExpirationDateReminder(fruitType, expirationDate) - neededToSell);
                 return;
             } else {
                 neededToSell = neededToSell - expirationDateReminder;

@@ -7,7 +7,8 @@ public class StorageUpdaterImpl implements StorageUpdater {
 
     public void parseDataToStorage(List<Transaction> newData) {
         for (Transaction newTransaction : newData) {
-            StoreOperations transactionOperation = produceTransaction.getSuitableOperation(newTransaction);
+            StoreOperations transactionOperation = produceTransaction
+                    .getSuitableOperation(newTransaction);
             transactionOperation.executeOperation(newTransaction);
         }
     }
