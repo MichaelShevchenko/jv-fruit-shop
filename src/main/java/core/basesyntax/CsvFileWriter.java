@@ -20,7 +20,7 @@ public class CsvFileWriter {
         for (String fruit : storageService.getAllFruits()) {
             int fruitInstanceSum = 0;
             for (LocalDate expirationDate : storageService.getFruit(fruit).keySet()) {
-                fruitInstanceSum += storageService.getFruit(fruit).get(expirationDate);
+                fruitInstanceSum += storageService.getExpirationDateReminder(fruit, expirationDate);
             }
             formattedData.append(fruit).append(',').append(fruitInstanceSum).append('\n');
         }

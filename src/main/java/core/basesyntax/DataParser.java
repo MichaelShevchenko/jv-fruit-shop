@@ -10,6 +10,7 @@ public class DataParser {
     private static final int PRODUCT_TYPE_INDEX = 1;
     private static final int QUANTITY_INDEX = 2;
     private static final int DATE_INDEX = 3;
+    StoreOperations operationsHandler = new StoreOperations();
 
     public Transaction parseLineToTransaction(String lineFromFile) {
         String[] line = lineFromFile.split(COMMA_DELIMITER);
@@ -19,7 +20,7 @@ public class DataParser {
     }
 
     private void checkDataFormat(String[] lineFromFile) {
-        if (!StoreOperations.containsOperation(lineFromFile[OPERATION_TYPE_INDEX])) {
+        if (!operationsHandler.containsOperation(lineFromFile[OPERATION_TYPE_INDEX])) {
             throw new IllegalFormatFlagsException("File provides unsupported operation type");
         }
         try {

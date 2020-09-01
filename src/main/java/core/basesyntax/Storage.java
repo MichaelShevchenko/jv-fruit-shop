@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 public class Storage {
     private static Map<String, TreeMap<LocalDate, Integer>> fruitsInStore = new HashMap<>();
+    StoreOperations operationsHandler = new StoreOperations();
 
     public TreeMap<LocalDate, Integer> getFruit(String fruit) {
         return new TreeMap<>(fruitsInStore.get(fruit));
@@ -20,9 +21,9 @@ public class Storage {
         LocalDate date = newTransaction.getDate();
 
         fruitsInStore.putIfAbsent(fruitType, new TreeMap<>());
-        Storage.fruitsInStore.get(fruitType).computeIfPresent(date, (key, value)
-                -> StoreOperations.calculate(value, fruitAmount, operationType));
-        Storage.fruitsInStore.get(fruitType).putIfAbsent(date, fruitAmount);
+        fruitsInStore.get(fruitType).computeIfPresent(date, (key, value)
+                -> operationsHandler.calculate(value, fruitAmount, operationType));
+        fruitsInStore.get(fruitType).putIfAbsent(date, fruitAmount);
     }
 
     public int getExpirationDateReminder(String fruit, LocalDate date) {
