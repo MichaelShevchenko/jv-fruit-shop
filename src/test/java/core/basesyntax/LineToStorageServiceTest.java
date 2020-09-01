@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class LineToStorageTest {
+public class LineToStorageServiceTest {
     private static DataParser parser = new DataParser();
-    private static StorageUpdaterImpl newUpdate;
-    private Storage storageService;
+    private StorageService storageService;
+    private OperationFactory produceTransaction;
     private Map<String, TreeMap<LocalDate, Integer>> toCompareStore;
 
     private static final Transaction SUPPLY_BANANA_TO_STORE
@@ -41,15 +41,16 @@ public class LineToStorageTest {
 
     @Before
     public void setUp() {
-        newUpdate = new StorageUpdaterImpl();
-        storageService = new Storage();
+        storageService = new StorageService();
+        produceTransaction = new OperationFactory();
         toCompareStore = new HashMap<>();
         storageService.clearStorage();
     }
 
     @Test
     public void buyWhenStockIsEmpty() {
-        newUpdate.putLineToStorage(BUY_BANANA_OVER_EXPIRATION_DATE);
+        produceTransaction.getSuitableOperation(BUY_BANANA_OVER_EXPIRATION_DATE)
+                .executeOperation(BUY_BANANA_OVER_EXPIRATION_DATE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -58,7 +59,8 @@ public class LineToStorageTest {
     public void returnWhenStockIsEmpty() {
         toCompareStore.put("orange", new TreeMap<>());
         toCompareStore.get("orange").put(LocalDate.parse("2020-10-21"), 17);
-        newUpdate.putLineToStorage(RETURN_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_ORANGE_TO_STORE)
+                .executeOperation(RETURN_ORANGE_TO_STORE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -67,7 +69,8 @@ public class LineToStorageTest {
     public void supplyWhenStockIsEmpty() {
         toCompareStore.put("apple", new TreeMap<>());
         toCompareStore.get("apple").put(LocalDate.parse("2020-10-22"), 20);
-        newUpdate.putLineToStorage(SUPPLY_APPLE_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_APPLE_TO_STORE)
+                .executeOperation(SUPPLY_APPLE_TO_STORE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -76,8 +79,10 @@ public class LineToStorageTest {
     public void buyWhenExpirationDateOver() {
         toCompareStore.put("banana", new TreeMap<>());
         toCompareStore.get("banana").put(LocalDate.parse("2020-10-17"), 15);
-        newUpdate.putLineToStorage(SUPPLY_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(BUY_BANANA_OVER_EXPIRATION_DATE);
+        produceTransaction.getSuitableOperation(SUPPLY_BANANA_TO_STORE)
+                .executeOperation(SUPPLY_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(BUY_BANANA_OVER_EXPIRATION_DATE)
+                .executeOperation(BUY_BANANA_OVER_EXPIRATION_DATE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -86,8 +91,10 @@ public class LineToStorageTest {
     public void buyLessThanInStock() {
         toCompareStore.put("banana", new TreeMap<>());
         toCompareStore.get("banana").put(LocalDate.parse("2020-10-17"), 5);
-        newUpdate.putLineToStorage(SUPPLY_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(BUY_BANANA_LESS_THAN_IN_STOCK);
+        produceTransaction.getSuitableOperation(SUPPLY_BANANA_TO_STORE)
+                .executeOperation(SUPPLY_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(BUY_BANANA_LESS_THAN_IN_STOCK)
+                .executeOperation(BUY_BANANA_LESS_THAN_IN_STOCK);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -95,8 +102,10 @@ public class LineToStorageTest {
     @Test
     public void buyMoreThanInStock() {
         toCompareStore.put("apple", new TreeMap<>());
-        newUpdate.putLineToStorage(SUPPLY_APPLE_TO_STORE);
-        newUpdate.putLineToStorage(BUY_APPLE_MORE_THAN_IN_STOCK);
+        produceTransaction.getSuitableOperation(SUPPLY_APPLE_TO_STORE)
+                .executeOperation(SUPPLY_APPLE_TO_STORE);
+        produceTransaction.getSuitableOperation(BUY_APPLE_MORE_THAN_IN_STOCK)
+                .executeOperation(BUY_APPLE_MORE_THAN_IN_STOCK);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -111,11 +120,16 @@ public class LineToStorageTest {
         toCompareStore.get("apple").put(LocalDate.parse("2020-10-22"), 20);
         toCompareStore.get("orange").put(LocalDate.parse("2020-10-21"), 17);
         toCompareStore.get("banana").put(LocalDate.parse("2020-10-20"), 7);
-        newUpdate.putLineToStorage(SUPPLY_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(SUPPLY_ORANGE_TO_STORE);
-        newUpdate.putLineToStorage(RETURN_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(SUPPLY_APPLE_TO_STORE);
-        newUpdate.putLineToStorage(RETURN_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_BANANA_TO_STORE)
+                .executeOperation(SUPPLY_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_ORANGE_TO_STORE)
+                .executeOperation(SUPPLY_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_BANANA_TO_STORE)
+                .executeOperation(RETURN_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_APPLE_TO_STORE)
+                .executeOperation(SUPPLY_APPLE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_ORANGE_TO_STORE)
+                .executeOperation(RETURN_ORANGE_TO_STORE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -129,12 +143,18 @@ public class LineToStorageTest {
         toCompareStore.get("orange").put(LocalDate.parse("2020-10-19"), 25);
         toCompareStore.get("apple").put(LocalDate.parse("2020-10-22"), 34);
         toCompareStore.get("banana").put(LocalDate.parse("2020-10-20"), 7);
-        newUpdate.putLineToStorage(SUPPLY_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(SUPPLY_ORANGE_TO_STORE);
-        newUpdate.putLineToStorage(SUPPLY_APPLE_TO_STORE);
-        newUpdate.putLineToStorage(RETURN_APPLE_WITH_SAME_EXPIRATION);
-        newUpdate.putLineToStorage(SUPPLY_ORANGE_WITH_SAME_EXPIRATION);
-        newUpdate.putLineToStorage(RETURN_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_BANANA_TO_STORE)
+                .executeOperation(SUPPLY_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_ORANGE_TO_STORE)
+                .executeOperation(SUPPLY_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_APPLE_TO_STORE)
+                .executeOperation(SUPPLY_APPLE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_APPLE_WITH_SAME_EXPIRATION)
+                .executeOperation(RETURN_APPLE_WITH_SAME_EXPIRATION);
+        produceTransaction.getSuitableOperation(SUPPLY_ORANGE_WITH_SAME_EXPIRATION)
+                .executeOperation(SUPPLY_ORANGE_WITH_SAME_EXPIRATION);
+        produceTransaction.getSuitableOperation(RETURN_BANANA_TO_STORE)
+                .executeOperation(RETURN_BANANA_TO_STORE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }
@@ -147,13 +167,20 @@ public class LineToStorageTest {
         toCompareStore.get("banana").put(LocalDate.parse("2020-10-17"), 15);
         toCompareStore.get("orange").put(LocalDate.parse("2020-10-18"), 10);
         toCompareStore.get("apple").put(LocalDate.parse("2020-10-22"), 20);
-        newUpdate.putLineToStorage(SUPPLY_BANANA_TO_STORE);
-        newUpdate.putLineToStorage(SUPPLY_ORANGE_TO_STORE);
-        newUpdate.putLineToStorage(RETURN_ORANGE_TO_STORE);
-        newUpdate.putLineToStorage(RETURN_ORANGE_OVER_PURCHASE_DATE);
-        newUpdate.putLineToStorage(SUPPLY_ORANGE_WITH_SAME_EXPIRATION);
-        newUpdate.putLineToStorage(BUY_LOTS_OF_ORANGES);
-        newUpdate.putLineToStorage(SUPPLY_APPLE_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_BANANA_TO_STORE)
+                .executeOperation(SUPPLY_BANANA_TO_STORE);
+        produceTransaction.getSuitableOperation(SUPPLY_ORANGE_TO_STORE)
+                .executeOperation(SUPPLY_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_ORANGE_TO_STORE)
+                .executeOperation(RETURN_ORANGE_TO_STORE);
+        produceTransaction.getSuitableOperation(RETURN_ORANGE_OVER_PURCHASE_DATE)
+                .executeOperation(RETURN_ORANGE_OVER_PURCHASE_DATE);
+        produceTransaction.getSuitableOperation(SUPPLY_ORANGE_WITH_SAME_EXPIRATION)
+                .executeOperation(SUPPLY_ORANGE_WITH_SAME_EXPIRATION);
+        produceTransaction.getSuitableOperation(BUY_LOTS_OF_ORANGES)
+                .executeOperation(BUY_LOTS_OF_ORANGES);
+        produceTransaction.getSuitableOperation(SUPPLY_APPLE_TO_STORE)
+                .executeOperation(SUPPLY_APPLE_TO_STORE);
         Map<String, TreeMap<LocalDate, Integer>> actualResult = storageService.getAllData();
         Assert.assertEquals(toCompareStore, actualResult);
     }

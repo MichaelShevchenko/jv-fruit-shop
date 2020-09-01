@@ -9,9 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class StorageUpdaterTest {
-    private static StorageUpdater newUpdate;
-    private Storage storageService;
+public class StorageServiceUpdaterTest {
+    private StorageUpdater newUpdate;
+    private StorageService storageService;
     private static final String PROPERLY_FILLED_FILE = "src/test/resources/test11.csv";
     private static final String SECOND_PROPERLY_FILLED_FILE = "src/test/resources/test6.csv";
     private static final String INCOMPLETE_DATA_FILE = "src/test/resources/test10.csv";
@@ -44,7 +44,7 @@ public class StorageUpdaterTest {
     @Before
     public void setUp() {
         newUpdate = new StorageUpdaterImpl();
-        storageService = new Storage();
+        storageService = new StorageService();
         storageService.clearStorage();
     }
 
